@@ -34,11 +34,19 @@ arrayValue.forEach(product=>{
 
 
 // 2.filter Using 
-
+/*
 const newFilter = products.filter(products =>products.price >1000);
 console.log(newFilter)
 
+*/
+const filterSomeProducts = products.filter(p => p.id !== 2);
+console.log(filterSomeProducts)
 
+
+
+// Find using -> it's always find a single value product in the 
+const findPrice = products.find(p =>p.id === 2);
+console.log(findPrice)
 
 
 

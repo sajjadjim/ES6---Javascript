@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Calendar with Bangla Date & Holidays</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        .container {
+            margin: 20px auto;
+            max-width: 90%;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            margin-bottom: 10px;
+        }
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 20px;
+        }
+        .day {
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            position: relative;
+        }
+        .header {
+            font-weight: bold;
+            background: #333;
+            color: white;
+        }
+        .today {
+            background: orange !important;
+            font-weight: bold;
+        }
+        .holiday {
+            background: red !important;
+        }
+        .bangla-date {
+            font-size: 12px;
+            display: block;
+            margin-top: 5px;
+        }
+        .nav-buttons {
+            margin: 10px;
+        }
+        button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+        }
+        @media (max-width: 600px) {
+            .calendar {
+                grid-template-columns: repeat(7, minmax(30px, 1fr));
+            }
+            .day {
+                padding: 8px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="currentDate"></h1>
+        <h2 id="currentTime"></h2>
+        <div class="nav-buttons">
+            <button onclick="changeMonth(-1)">Previous Month</button>
+            <button onclick="changeMonth(1)">Next Month</button>
+        </div>
+        <div class="calendar" id="calendar"></div>
+    </div>
+
+    <script>
+        const holidays = {
+            "1-1": "New Year's Day",
+            "2-21": "International Mother Language Day",
+            "3-17": "Bangabandhu's Birthday",
+            "3-26": "Independence Day",
+            "4-14": "Pohela Boishakh",
+            "5-1": "Labour Day",
+            "12-16": "Victory Day",
+            "12-25": "Christmas Day"
+        };
+
+        let currentYear = new Date().getFullYear();
+        let currentMonth = new Date().getMonth();
+
+        function getBanglaDate(day, month) {
+            const banglaMonths = ["পৌষ", "মাঘ", "ফাল্গুন", "চৈত্র", "বৈশাখ", "জ্যৈষ্ঠ", "আষাঢ়", "শ্রাবণ", "ভাদ্র", "আশ্বিন", "কার্তিক", "অগ্রহায়ণ"];
+            return `${day} ${banglaMonths[month]}`;
+        }
+
+        function updateCalendar() {
+            const currentDate = new Date(currentYear, currentMonth);
+            document.getElementById("currentDate").innerText = currentDate.toLocaleString('en-us', { month: 'long', year: 'numeric' });
+            
+            const calendar = document.getElementById("calendar");
+            calendar.innerHTML = "";
+            
+            const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            daysOfWeek.forEach(day => {
+                const dayElement = document.createElement("div");
+                dayElement.classList.add("day", "header");
+                dayElement.innerText = day;
+                calendar.appendChild(dayElement);
+            });
+            
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const lastDate = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() === currentYear && today.getMonth() === currentMonth;
+            
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement("div");
+                calendar.appendChild(emptyCell);
+            }
+            
+            for (let day = 1; day <= lastDate; day++) {
+                const dayElement = document.createElement("div");
+                dayElement.classList.add("day");
+                dayElement.innerText = day;
+                
+                const banglaDate = document.createElement("span");
+                banglaDate.classList.add("bangla-date");
+                banglaDate.innerText = getBanglaDate(day, currentMonth);
+                dayElement.appendChild(banglaDate);
+                
+                if (isCurrentMonth && day === today.getDate()) {
+                    dayElement.classList.add("today");
+                }
+                
+                const holidayKey = `${currentMonth + 1}-${day}`;
+                if (holidays[holidayKey]) {
+                    dayElement.classList.add("holiday");
+                }
+                
+                calendar.appendChild(dayElement);
+            }
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById("currentTime").innerText = timeString;
+        }
+
+        function changeMonth(offset) {
+            currentMonth += offset;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            updateCalendar();
+        }
+
+        updateCalendar();
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html>
